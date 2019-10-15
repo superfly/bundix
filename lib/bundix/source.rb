@@ -140,6 +140,7 @@ class Bundix
 
     def convert_path
       {
+        version: spec.version.to_s,
         source: {
           type: 'path',
           path: spec.source.path,
@@ -152,9 +153,13 @@ class Bundix
       hash = fetcher.fetch_local_hash(spec)
       remote, hash = fetcher.fetch_remotes_hash(spec, remotes) unless hash
       fail "couldn't fetch hash for #{spec.full_name}" unless hash
-      puts "#{hash} => #{spec.full_name}.gem" if $VERBOSE
+
+      version = spec.version.to_s
+
+      puts "#{hash} => #{spec.name}-#{version}.gem" if $VERBOSE
 
       {
+        version: version,
         source: {
           type: 'gem',
           remotes: (remote ? [remote] : remotes),
@@ -174,6 +179,7 @@ class Bundix
       puts "#{hash} => #{uri}" if $VERBOSE
 
       {
+        version: spec.version.to_s,
         source: {
           type: 'git',
           url: uri.to_s,

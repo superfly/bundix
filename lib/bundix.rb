@@ -88,7 +88,6 @@ class Bundix
   def convert_spec(spec, cache, dep_cache)
     {
       spec.name => [
-        { version: spec.version.to_s },
         platforms(spec, dep_cache),
         groups(spec, dep_cache),
         Source.new(spec, fetcher).convert,
