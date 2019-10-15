@@ -1,23 +1,23 @@
 require 'minitest/autorun'
 require 'bundix'
+require 'digest'
+require 'json'
 
 class TestConvert < Minitest::Test
-  class PrefetchStub
+  class PrefetchStub < Bundix::Fetcher
     def nix_prefetch_url(*args)
-      return "nix_prefetch_url_hash"
+      format_hash(Digest::SHA256.hexdigest(args.to_s))
     end
 
-    def nix_prefetch_git(uri, revision)
-      return '{"sha256": "nix_prefetch_git_hash"}'
+    def nix_prefetch_git(*args)
+      JSON.generate("sha256" => format_hash(Digest::SHA256.hexdigest(args.to_s)))
     end
 
     def fetch_local_hash(spec)
-      return "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03" #taken from `man nix-hash`
+      # Force to use fetch_remote_hash
+      return nil
     end
 
-    def fetch_remotes_hash(spec, remotes)
-      return "fetch_remotes_hash_hash"
-    end
   end
 
   def with_gemset(options)
