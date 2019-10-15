@@ -140,8 +140,10 @@ class Bundix
 
     def convert_path
       {
-        type: "path",
-        path: spec.source.path
+        source: {
+          type: 'path',
+          path: spec.source.path,
+        },
       }
     end
 
@@ -152,9 +154,13 @@ class Bundix
       fail "couldn't fetch hash for #{spec.full_name}" unless hash
       puts "#{hash} => #{spec.full_name}.gem" if $VERBOSE
 
-      { type: 'gem',
-        remotes: (remote ? [remote] : remotes),
-        sha256: hash }
+      {
+        source: {
+          type: 'gem',
+          remotes: (remote ? [remote] : remotes),
+          sha256: hash,
+        },
+      }
     end
 
     def convert_git
@@ -167,11 +173,15 @@ class Bundix
       fail "couldn't fetch hash for #{spec.full_name}" unless hash
       puts "#{hash} => #{uri}" if $VERBOSE
 
-      { type: 'git',
-        url: uri.to_s,
-        rev: revision,
-        sha256: hash,
-        fetchSubmodules: submodules }
+      {
+        source: {
+          type: 'git',
+          url: uri.to_s,
+          rev: revision,
+          sha256: hash,
+          fetchSubmodules: submodules,
+        },
+      }
     end
   end
 end
