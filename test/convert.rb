@@ -5,6 +5,13 @@ require 'json'
 
 class TestConvert < Minitest::Test
   class PrefetchStub < Bundix::Fetcher
+    SPECS = {
+      "sorbet-static" => {
+        platform: 'java-123',
+        version: "0.4.4821",
+      },
+    }
+
     def nix_prefetch_url(*args)
       format_hash(Digest::SHA256.hexdigest(args.to_s))
     end
@@ -18,6 +25,16 @@ class TestConvert < Minitest::Test
       return nil
     end
 
+    def spec_for_dependency(remote, name, version)
+      opts = SPECS[name]
+      raise "Unexpected spec query: #{name}" unless opts
+
+      Gem::Specification.new do |s|
+        s.name = name
+        s.version = version
+        s.platform = Gem::Platform.new(opts[:platform]) if opts[:platform]
+      end
+    end
   end
 
   def with_gemset(options)
@@ -40,7 +57,7 @@ class TestConvert < Minitest::Test
     ) do |gemset|
       assert_equal("0.5.0", gemset.dig("bundler-audit", :version))
       assert_equal("0.19.4", gemset.dig("thor", :version))
-      assert_equal("0.4.4821", gemset.dig("sorbet-static", :version))
+      assert_equal("0.4.4821-java-unknown", gemset.dig("sorbet-static", :version))
     end
   end
 end
