@@ -84,7 +84,16 @@ class Bundix
       PLATFORM_MAPPING[platform_name.to_s]
     end.flatten
 
-    {platforms: platforms}
+    # 'platforms' is the Bundler DSL for including a gem if we're on a certain platform.
+    # 'target_platform' is the platform that bundix is currently resolving gem-specs for.
+    # 'gem_platform' is the platform of the resulting spec.
+    # (eg we might be resolving gem-specs for x86_64-darwin, but if there's not a suitable
+    # precompiled gem available, then gem_platform will just be 'ruby')
+    {
+      platforms: platforms,
+      target_platform: target_platform.to_s,
+      gem_platform: spec.platform.to_s,
+    }
   end
 
   def convert_spec(spec, cache, dep_cache)
@@ -105,6 +114,7 @@ class Bundix
     name, cached = cache.find{|k, v|
       next unless k == spec.name
       next unless cached_source = v['source']
+      next unless target_platform.to_s == v['target_platform']
 
       case spec_source = spec.source
       when Bundler::Source::Git
