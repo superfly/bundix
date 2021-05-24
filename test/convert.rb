@@ -53,7 +53,19 @@ class TestConvert < Minitest::Test
   def test_bundler_dep
     with_gemset(
       :gemfile => File.expand_path("data/bundler-audit/Gemfile", __dir__),
-      :lockfile => File.expand_path("data/bundler-audit/Gemfile.lock", __dir__)
+      :lockfile => File.expand_path("data/bundler-audit/Gemfile.lock", __dir__),
+    ) do |gemset|
+      assert_equal("0.5.0", gemset.dig("bundler-audit", :version))
+      assert_equal("0.19.4", gemset.dig("thor", :version))
+      refute(gemset.has_key?("sorbet-static"))
+    end
+  end
+
+  def test_platform_specific_lookups
+    with_gemset(
+      :gemfile => File.expand_path("data/bundler-audit/Gemfile", __dir__),
+      :lockfile => File.expand_path("data/bundler-audit/Gemfile.lock", __dir__),
+      :platform => 'java'
     ) do |gemset|
       assert_equal("0.5.0", gemset.dig("bundler-audit", :version))
       assert_equal("0.19.4", gemset.dig("thor", :version))

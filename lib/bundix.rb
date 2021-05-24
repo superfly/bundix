@@ -44,6 +44,7 @@ class Bundix
     lock.specs.group_by(&:name).each.with_object({}) do |(name, specs), gems|
       # reverse so git/plain-ruby sources come last
       spec = specs.reverse.find {|s| s.platform == Gem::Platform::RUBY || s.platform =~ target_platform }
+      next unless spec
       gem = find_cached_spec(spec, cache) || convert_spec(spec, cache, dep_cache)
       gems.merge!(gem)
 
