@@ -17,7 +17,7 @@ class Bundix
 
   SHA256_32 = %r(^[a-z0-9]{52}$)
 
-  attr_reader :options
+  attr_reader :options, :target_platform
 
   attr_accessor :fetcher
 
@@ -32,6 +32,7 @@ class Bundix
 
   def initialize(options)
     @options = { quiet: false, tempfile: nil }.merge(options)
+    @target_platform = options[:platform] ? Gem::Platform.new(options[:platform]) : Gem::Platform::RUBY
     @fetcher = Fetcher.new
   end
 
@@ -40,8 +41,9 @@ class Bundix
     lock = parse_lockfile
     dep_cache = build_depcache(lock)
 
-    # reverse so git comes last
-    lock.specs.reverse_each.with_object({}) do |spec, gems|
+    lock.specs.group_by(&:name).each.with_object({}) do |(name, specs), gems|
+      # reverse so git/plain-ruby sources come last
+      spec = specs.reverse.find {|s| s.platform == Gem::Platform::RUBY || s.platform =~ target_platform }
       gem = find_cached_spec(spec, cache) || convert_spec(spec, cache, dep_cache)
       gems.merge!(gem)
 

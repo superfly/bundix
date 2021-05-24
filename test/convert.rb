@@ -25,13 +25,13 @@ class TestConvert < Minitest::Test
       return nil
     end
 
-    def spec_for_dependency(remote, name, version)
-      opts = SPECS[name]
+    def spec_for_dependency(remote, spec)
+      opts = SPECS[spec.name]
       raise "Unexpected spec query: #{name}" unless opts
 
       Gem::Specification.new do |s|
-        s.name = name
-        s.version = version
+        s.name = spec.name
+        s.version = spec.version
         s.platform = Gem::Platform.new(opts[:platform]) if opts[:platform]
       end
     end

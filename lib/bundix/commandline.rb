@@ -15,7 +15,8 @@ class Bundix
       gemfile: 'Gemfile',
       lockfile: 'Gemfile.lock',
       gemset: 'gemset.nix',
-      project: File.basename(Dir.pwd)
+      project: File.basename(Dir.pwd),
+      platform: 'ruby'
     }
 
     def self.run
@@ -65,6 +66,10 @@ class Bundix
 
         o.on "--gemfile=#{options[:gemfile]}", 'path to the Gemfile' do |value|
           options[:gemfile] = File.expand_path(value)
+        end
+
+        o.on "--platform=#{options[:platform]}", 'platform version to use' do |value|
+          options[:platform] = value
         end
 
         o.on '-d', '--dependencies', 'include gem dependencies (deprecated)' do
