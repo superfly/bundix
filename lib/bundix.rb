@@ -183,7 +183,11 @@ class Bundix
   end
 
   def parse_lockfile
-    Bundler::LockfileParser.new(File.read(options[:lockfile]))
+    lock = Bundler::LockfileParser.new(File.read(options[:lockfile]))
+    if !lock.platforms.include?(target_platform)
+      raise KeyError, "#{target_platform} not listed in gemfile. Try `bundle lock --add-platform #{target_platform}`"
+    end
+    lock
   end
 
   def self.sh(*args, &block)
